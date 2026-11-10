@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="ms" data-theme="pdrm7">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polis Diraja Malaysia — Portal Rasmi (Mockup v7)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Fon: Lexend (tajuk) + Plus Jakarta Sans (teks) -->
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- daisyUI 5 + Tailwind CSS 4 (asas templat Nexus) -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2/dist/iconify-icon.min.js"></script>
+
+  <style>
+    /* Tema "pdrm7" — Biru Diraja + Kuning Emas + Merah */
+    [data-theme="pdrm7"] {
+      color-scheme: light;
+      --color-base-100: #ffffff;
+      --color-base-200: #f3f6fc;
+      --color-base-300: #dfe6f3;
+      --color-base-content: #0c1b36;
+      --color-primary: #0b2a5b;          /* biru diraja */
+      --color-primary-content: #ffffff;
+      --color-secondary: #f5b800;        /* kuning emas */
+      --color-secondary-content: #0c1b36;
+      --color-accent: #b3121f;           /* merah */
+      --color-accent-content: #ffffff;
+      --color-neutral: #06142e;
+      --color-neutral-content: #ffffff;
+      --color-info: #1d6ff2;
+      --color-success: #15a34a;
+      --color-warning: #f5b800;
+      --color-error: #b3121f;
+      --radius-selector: 9999px;
+      --radius-field: 0.5rem;
+      --radius-box: 1rem;
+      --border: 1px;
+      --depth: 0;
+      --noise: 0;
+    }
+    :root {
+      --a11y-primary: #0b2a5b; --a11y-primary-2: #143d78; --a11y-accent: #f5b800;
+      --a11y-blue: #143d78; --a11y-soft: #f3f6fc; --a11y-font: "Plus Jakarta Sans", system-ui, sans-serif;
+    }
+    #govInfo { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+    #govInfo > div { overflow: hidden; }
+    #govInfo[data-open="true"] { grid-template-rows: 1fr; }
+    #govToggle[aria-expanded="true"] iconify-icon { transform: rotate(180deg); }
+
+    /* Jalur tiga warna (biru / emas / merah) */
+    .tri-stripe { height: 4px; background: linear-gradient(90deg, #0b2a5b 0 60%, #f5b800 60% 85%, #b3121f 85% 100%); }
+
+    /* Ticker & marquee */
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee { display: flex; width: max-content; animation: marquee 40s linear infinite; }
+    .marquee:hover { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }
+
+    /* Corak jalur serong di hero */
+    .hero-pattern {
+      background-image:
+        repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 2px, transparent 2px 22px);
+    }
+  </style>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+      --font-heading: "Lexend", "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+      --color-royal: #0b2a5b;
+      --color-royal-700: #143d78;
+      --color-royal-900: #06142e;
+      --color-gold: #f5b800;
+      --color-gold-600: #d99e00;
+      --color-gold-50: #fff8e1;
+      --color-red: #b3121f;
+      --color-red-700: #8c0d18;
+      --color-base-100: #ffffff;
+      --color-base-200: #f3f6fc;
+      --color-base-300: #dfe6f3;
+      --color-base-content: #0c1b36;
+      --color-primary: #0b2a5b;
+      --color-primary-content: #ffffff;
+      --color-secondary: #f5b800;
+      --color-secondary-content: #0c1b36;
+      --color-accent: #b3121f;
+      --color-accent-content: #ffffff;
+      --color-neutral: #06142e;
+      --color-neutral-content: #ffffff;
+      --radius-box: 1rem;
+      --radius-field: 0.5rem;
+      --radius-selector: 9999px;
+    }
+    @layer base {
+      body { @apply bg-base-100 text-base-content antialiased; }
+      h1, h2, h3, .font-heading { font-family: var(--font-heading); letter-spacing: -0.015em; }
+    }
+    @utility container { @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8; }
+
+    /* Mega menu */
+    .nav-item > .mega {
+      position: absolute; left: 0; right: 0; top: 100%;
+      visibility: hidden; opacity: 0; transform: translateY(6px);
+      transition: opacity .15s ease .15s, transform .15s ease .15s, visibility 0s linear .3s;
+    }
+    .nav-item:hover > .mega, .nav-item:focus-within > .mega { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+    .nav-link { @apply relative flex h-full items-center gap-1 px-3.5 text-[15px] font-semibold text-base-content/80 transition hover:text-royal; }
+    .nav-link::after { content: ""; @apply absolute inset-x-3.5 bottom-0 h-[3px] origin-center scale-x-0 rounded-t-full bg-gold transition duration-200; }
+    .nav-item:hover > .nav-link::after, .nav-link[aria-current="page"]::after { @apply scale-x-100; }
+    .nav-link[aria-current="page"] { @apply text-royal; }
+    .nav-item:hover > .nav-link iconify-icon { transform: rotate(180deg); }
+    .mega-col p { @apply text-xs font-bold tracking-wider text-red uppercase; }
+    .mega-col a { @apply flex items-center gap-2 rounded-field px-2 py-1.5 -mx-2 text-sm text-base-content/80 hover:bg-gold-50 hover:text-royal; }
+    .mega-col a::before { content: ""; @apply size-1.5 flex-none rounded-full bg-base-300 transition; }
+    .mega-col a:hover::before { @apply bg-gold; }
+
+    /* Tajuk seksyen */
+    .eyebrow { @apply inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] text-red uppercase; }
+    .eyebrow::before { content: ""; @apply h-0.5 w-6 rounded-full bg-red; }
+
+    /* Tab Kenyataan & Hebahan — garis bawah emas, tanpa latar */
+    .hb-tab { @apply relative -mb-px pb-3 text-[15px] font-semibold text-base-content/55 transition hover:text-royal; }
+    .hb-tab::after { content: ""; @apply absolute inset-x-0 bottom-0 h-[3px] scale-x-0 rounded-t-full bg-gold transition; }
+    .hb-tab[aria-selected="true"] { @apply text-royal; }
+    .hb-tab[aria-selected="true"]::after { @apply scale-x-100; }
+
+    .a11y-wrap { position: relative; }
+    .a11y-tooltip { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-4px); background: #f3f6fc; color: #0c1b36; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease; z-index: 120; }
+    .a11y-wrap:hover .a11y-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  </style>
+</head>
+<body>
+<div id="a11y-root">
+
+<!-- ============ JALUR UTILITI ============ -->
+<div class="bg-royal-900 text-white">
+  <div class="container flex h-10 items-center justify-between text-[13px]">
+    <p class="flex items-center gap-2 text-white/80">
+      <img src="https://rmp2u.rmp.gov.my/assets/flag-icons/flags/4x3/my.svg" alt="" class="h-3 w-4 rounded-[2px]" />
+      <span class="max-sm:hidden">Laman Web Rasmi Kerajaan Malaysia</span>
+      <span class="sm:hidden">Portal Rasmi</span>
+      <button type="button" id="govToggle" aria-expanded="false" aria-controls="govInfo" class="text-gold ms-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold transition hover:bg-white/10 aria-expanded:bg-white/10">
+        <span class="max-sm:hidden">Kenal pasti begini</span><span class="sm:hidden">Kenal pasti</span>
+        <iconify-icon icon="lucide:chevron-down" class="transition-transform duration-200"></iconify-icon>
+      </button>
+    </p>
+    <p class="text-white/60 max-md:hidden">Talian Kecemasan <b class="text-gold">999</b> · Respons Scam <b class="text-gold">997</b></p>
+  </div>
+  <div id="govInfo" data-open="false">
+    <div>
+      <div class="container grid gap-6 py-6 md:grid-cols-2 md:gap-12">
+        <div class="flex gap-4">
+          <span class="text-gold inline-flex size-10 flex-none items-center justify-center rounded-full bg-white/10"><iconify-icon icon="lucide:landmark" class="text-xl"></iconify-icon></span>
+          <div>
+            <p class="font-semibold">Pautan portal rasmi berakhir dengan .gov.my</p>
+            <p class="mt-1 text-sm text-white/70">Sekiranya anda melihat pautan selain <b class="text-white">.gov.my</b>, segera tutupkan halaman itu walaupun ia menyerupai portal rasmi!</p>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <span class="text-gold inline-flex size-10 flex-none items-center justify-center rounded-full bg-white/10"><iconify-icon icon="lucide:lock-keyhole" class="text-xl"></iconify-icon></span>
+          <div>
+            <p class="font-semibold">Portal yang selamat menggunakan HTTPS</p>
+            <p class="mt-1 text-sm text-white/70">Periksa ikon kunci mangga ( <iconify-icon icon="lucide:lock" class="align-[-2px] text-white"></iconify-icon> ) atau <b class="text-white">https://</b> di depan pautan. Sekiranya tiada, tinggalkan laman sesawang serta merta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tri-stripe"></div>
+
+<!-- ============ HEADER (gaya v2: logo di atas, menu di bawah) ============ -->
+<header id="topbar" class="bg-base-100 sticky top-0 z-50 border-b border-base-300 transition-shadow data-[scrolled=true]:shadow-lg data-[scrolled=true]:shadow-royal/5">
+  <div class="container flex h-[76px] items-center justify-between gap-4">
+    <a href="#" class="flex items-center gap-3">
+      <img src="https://rmp2u.rmp.gov.my/media/20" alt="Jata Negara Malaysia" class="h-11 w-auto max-sm:hidden" />
+      <span class="bg-base-300 hidden h-9 w-px sm:block"></span>
+      <img src="https://rmp2u.rmp.gov.my/media/36685" alt="Logo PDRM" class="h-11 w-auto" />
+      <span class="leading-none">
+        <span class="font-heading text-royal block text-[15px] font-bold tracking-tight whitespace-nowrap uppercase sm:text-[18px]">Polis Diraja Malaysia</span>
+        <span class="text-base-content/60 mt-1 block text-xs font-medium">Royal Malaysia Police</span>
+      </span>
+    </a>
+    <div class="flex items-center gap-3">
+      <div class="hidden items-center gap-3.5 md:flex">
+        <a href="#" class="tooltip tooltip-bottom opacity-80 hover:opacity-100" data-tip="Soalan Lazim"><img src="images/soalan-lazim.png" alt="Soalan Lazim" class="h-[22px] w-auto" /></a>
+        <a href="hubungi-kami.html" class="tooltip tooltip-bottom opacity-80 hover:opacity-100" data-tip="Hubungi"><img src="images/hubungi.png" alt="Hubungi" class="h-[22px] w-auto" /></a>
+        <a href="#" class="tooltip tooltip-bottom opacity-80 hover:opacity-100" data-tip="Maklum Balas"><img src="images/maklumbalas.png" alt="Maklum Balas" class="h-[22px] w-auto" /></a>
+        <a href="#" class="tooltip tooltip-bottom opacity-80 hover:opacity-100" data-tip="Peta Laman"><img src="images/peta-laman.png" alt="Peta Laman" class="h-[22px] w-auto" /></a>
+      </div>
+      <div class="hidden h-4 w-px bg-base-300 md:block"></div>
+      <div id="langSwitch" class="bg-base-200 flex items-center rounded-full p-0.5 text-[12px] font-bold">
+        <button type="button" class="bg-royal rounded-full px-2.5 py-0.5 text-white" aria-pressed="true">BM</button>
+        <button type="button" class="text-base-content/50 hover:text-royal rounded-full px-2.5 py-0.5" aria-pressed="false">EN</button>
+      </div>
+      <div class="a11y-wrap">
+        <button class="btn btn-circle btn-ghost btn-sm text-royal hover:bg-base-200 hover:border-transparent" id="a11yBtn" data-a11y-open type="button" aria-haspopup="dialog" aria-label="Alat Kebolehcapaian">
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="7.2" r="1.4" fill="currentColor" stroke="none"/><path d="M6.5 9.5c3.6 1.2 7.4 1.2 11 0M12 9.5v9M9 21l3-5.5 3 5.5"/></svg>
+        </button>
+        <span class="a11y-tooltip">Alat Kebolehcapaian</span>
+      </div>
+      <button class="btn btn-circle btn-ghost btn-sm text-royal hover:bg-base-200 hover:border-transparent" type="button" aria-label="Cari" onclick="document.getElementById('searchModal').showModal()">
+        <iconify-icon icon="lucide:search" class="text-base"></iconify-icon>
+      </button>
+      <label for="mobile-drawer" class="btn btn-ghost btn-square btn-sm text-royal lg:hidden" aria-label="Buka menu"><iconify-icon icon="lucide:menu" class="text-xl"></iconify-icon></label>
+    </div>
+  </div>
+
+  <!-- Menu utama (baris kedua) -->
+  <nav aria-label="Menu utama" class="border-base-300 hidden border-t lg:block">
+    <div class="container relative flex items-center justify-between">
+      <ul class="flex h-[52px] items-stretch">
+        <li class="nav-item flex"><a href="#" class="nav-link" aria-current="page">Utama</a></li>
+        <li class="nav-item flex">
+          <a href="#" class="nav-link">Profil <iconify-icon icon="lucide:chevron-down" class="text-sm transition-transform"></iconify-icon></a>
+          <div class="mega">
+            <div class="bg-base-100 border-base-300 grid grid-cols-12 overflow-hidden rounded-b-box border border-t-0 shadow-2xl shadow-royal/10">
+              <div class="col-span-8 grid grid-cols-3 gap-6 p-7">
+                <div class="mega-col"><p>Mengenai PDRM</p><div class="mt-3"><a href="#">Polis Diraja Malaysia</a><a href="#">Sejarah</a><a href="#">Visi, Misi &amp; Objektif</a><a href="#">Tugas &amp; Fungsi</a><a href="#">Piagam Pelanggan</a></div></div>
+                <div class="mega-col"><p>Kepimpinan</p><div class="mt-3"><a href="#">Ketua Polis Negara</a><a href="#">Pucuk Pimpinan PDRM</a><a href="#">Legasi Ketua Polis Negara</a><a href="#">Struktur Organisasi</a></div></div>
+                <div class="mega-col"><p>Institusi &amp; Dasar</p><div class="mt-3"><a href="#">Institusi Latihan</a><a href="#">Dasar Keselamatan &amp; Kesihatan Pekerjaan</a><a href="#">Ibu Pejabat Polis Kontinjen</a></div></div>
+              </div>
+              <a href="#" class="bg-royal group/c relative col-span-4 flex flex-col justify-end overflow-hidden p-6 text-white">
+                <img src="https://rmp2u.rmp.gov.my/media/245" alt="" class="absolute inset-0 h-full w-full object-cover opacity-40 transition duration-500 group-hover/c:scale-105" />
+                <span class="from-royal-900 absolute inset-0 bg-linear-to-t to-transparent"></span>
+                <span class="relative text-gold text-xs font-bold tracking-wider uppercase">Moto PDRM</span>
+                <span class="font-heading relative mt-1 text-xl font-bold">Polis dan Masyarakat Berpisah Tiada</span>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item flex">
+          <a href="#" class="nav-link">Jabatan <iconify-icon icon="lucide:chevron-down" class="text-sm transition-transform"></iconify-icon></a>
+          <div class="mega">
+            <div class="bg-base-100 border-base-300 rounded-b-box border border-t-0 p-7 shadow-2xl shadow-royal/10">
+              <div class="mega-col"><p>Jabatan di Ibu Pejabat Polis Bukit Aman</p>
+                <div class="mt-3 grid grid-cols-2 gap-x-10">
+                  <a href="#">Jabatan Pengurusan (JP)</a><a href="#">Cawangan Khas (CK)</a><a href="#">Jabatan Siasatan Jenayah (JSJ)</a><a href="#">Jabatan Keselamatan Dalam Negeri &amp; Ketenteraman Awam (JKDNKA)</a><a href="#">Jabatan Siasatan Jenayah Komersil (JSJK)</a><a href="#">Jabatan Siasatan Jenayah Narkotik (JSJN)</a><a href="#">Jabatan Logistik dan Teknologi (JLT)</a><a href="#">Jabatan Integriti dan Pematuhan Standard (JIPS)</a><a href="#">Jabatan Pencegahan Jenayah dan Keselamatan Komuniti (JPJKK)</a><a href="#">Jabatan Siasatan dan Penguatkuasaan Trafik (JSPT)</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item flex">
+          <a href="#" class="nav-link">Perkhidmatan <iconify-icon icon="lucide:chevron-down" class="text-sm transition-transform"></iconify-icon></a>
+          <div class="mega">
+            <div class="bg-base-100 border-base-300 grid grid-cols-4 gap-6 rounded-b-box border border-t-0 p-7 shadow-2xl shadow-royal/10">
+              <div class="mega-col"><p>Semakan &amp; Aduan</p><div class="mt-3"><a href="#">Semakan Saman Trafik (MyBayar)</a><a href="#">Semakan Status Laporan Polis</a><a href="#">Aduan SISPAA</a><a href="#">e-Reporting</a><a href="#">Semak Mule (CCID)</a></div></div>
+              <div class="mega-col"><p>Kerjaya &amp; Warga</p><div class="mt-3"><a href="#">e-Pengambilan PDRM</a><a href="#">Info Kerjaya</a><a href="#">e-Pesara</a><a href="#">e-Penyata Gaji</a><a href="#">Emel PDRM</a></div></div>
+              <div class="mega-col"><p>Pelesenan &amp; Perolehan</p><div class="mt-3"><a href="#">Pelesenan Senjata Api</a><a href="#">Pelesenan Am</a><a href="#">Perolehan &amp; Tender</a><a href="#">Sebut Harga</a></div></div>
+              <div class="mega-col"><p>Statistik &amp; Data</p><div class="mt-3"><a href="#">Statistik Pembayaran Saman</a><a href="#">Statistik Semakan Online</a><a href="#">Data Terbuka</a><a href="#">Nur Alert</a></div></div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item flex">
+          <a href="#" class="nav-link">Program <iconify-icon icon="lucide:chevron-down" class="text-sm transition-transform"></iconify-icon></a>
+          <div class="mega">
+            <div class="bg-base-100 border-base-300 grid grid-cols-4 gap-6 rounded-b-box border border-t-0 p-7 shadow-2xl shadow-royal/10">
+              <div class="mega-col"><p>Keselamatan Komuniti</p><div class="mt-3"><a href="#">AMANITA</a><a href="#">Go-To-Safety-Point (GTSP)</a><a href="#">Volunteer Smartphone Patrol (VSP)</a><a href="#">PDRM Special Dialogue (PSD)</a></div></div>
+              <div class="mega-col"><p>Trafik &amp; Operasi</p><div class="mt-3"><a href="#">Ops Selamat</a><a href="#">VTRec</a><a href="#">AISSE</a><a href="#">NAFSLE</a></div></div>
+              <div class="mega-col"><p>Organisasi</p><div class="mt-3"><a href="#">Amalan Hijau PDRM</a><a href="#">EKSA</a><a href="#">Risalah Pencegahan Jenayah</a></div></div>
+              <a href="#" class="rounded-box self-start overflow-hidden ring-1 ring-base-300"><img src="https://www.rmp.gov.my/images/default-source/Banner-2025/jom-eksa-portal-jom-sama2-budayakan-eksa-copy.jpg?sfvrsn=0" alt="Jom sama-sama membudayakan EKSA" class="w-full" /></a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item flex">
+          <a href="#" class="nav-link">Media <iconify-icon icon="lucide:chevron-down" class="text-sm transition-transform"></iconify-icon></a>
+          <div class="mega">
+            <div class="bg-base-100 border-base-300 grid grid-cols-4 gap-6 rounded-b-box border border-t-0 p-7 shadow-2xl shadow-royal/10">
+              <div class="mega-col"><p>Berita</p><div class="mt-3"><a href="#">Berita Semasa</a><a href="#">Kenyataan Media</a><a href="#">Pengumuman</a><a href="#">Siaran Media</a></div></div>
+              <div class="mega-col"><p>Multimedia</p><div class="mt-3"><a href="#">Galeri Foto</a><a href="#">Video</a><a href="#">Siri Media Sosial</a><a href="#">Takwim Aktiviti</a></div></div>
+              <div class="mega-col"><p>Penerbitan</p><div class="mt-3"><a href="#">Berita Bukit Aman</a><a href="#">Penerbitan</a><a href="#">Teks Ucapan</a><a href="#">IPCC</a></div></div>
+              <a href="#" class="rounded-box self-start overflow-hidden ring-1 ring-base-300"><img src="https://rmp2u.rmp.gov.my/media/36640" alt="Berita Bukit Aman" class="aspect-[4/3] w-full object-cover object-top" /></a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item flex">
+          <a href="#" class="nav-link">Hubungi <iconify-icon icon="lucide:chevron-down" class="text-sm transition-transform"></iconify-icon></a>
+          <div class="mega">
+            <div class="bg-base-100 border-base-300 grid grid-cols-4 gap-6 rounded-b-box border border-t-0 p-7 shadow-2xl shadow-royal/10">
+              <div class="mega-col"><p>Perhubungan</p><div class="mt-3"><a href="hubungi-kami.html">Hubungi Kami</a><a href="#">Direktori Balai Polis</a><a href="#">Peta Lokasi</a><a href="#">Maklum Balas</a></div></div>
+              <div class="mega-col"><p>Bantuan</p><div class="mt-3"><a href="#">Soalan Lazim (FAQ)</a><a href="#">Peta Laman</a><a href="#">Penarafan Portal</a></div></div>
+              <div class="bg-royal rounded-box col-span-2 flex items-center justify-between gap-4 p-6 text-white">
+                <div>
+                  <p class="font-semibold">Ibu Pejabat Polis Diraja Malaysia</p>
+                  <p class="mt-1 text-sm text-white/70">Jalan Bukit Aman, Tasik Perdana, 50560 Kuala Lumpur</p>
+                  <p class="text-gold font-heading mt-3 text-2xl font-bold">03-2266 2222</p>
+                </div>
+                <iconify-icon icon="lucide:phone-call" class="text-gold/40 text-6xl"></iconify-icon>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="flex items-center gap-2">
+        <a href="tel:999" class="btn btn-sm bg-red hover:bg-red-700 h-9 rounded-full border-0 px-4 text-white">
+          <span class="relative flex size-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span><span class="relative inline-flex size-2 rounded-full bg-white"></span></span>
+          Kecemasan 999
+        </a>
+        <a href="#" class="btn btn-primary btn-sm h-9 rounded-full px-4">Buat Laporan</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- Laci menu mudah alih -->
+<div class="drawer drawer-end z-[70] lg:hidden">
+  <input id="mobile-drawer" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-side">
+    <label for="mobile-drawer" aria-label="Tutup" class="drawer-overlay"></label>
+    <div class="bg-base-100 flex min-h-full w-80 flex-col">
+      <div class="tri-stripe"></div>
+      <ul class="menu w-full flex-1 p-4">
+        <li><a class="menu-active">Utama</a></li>
+        <li><details><summary>Profil PDRM</summary><ul><li><a>Polis Diraja Malaysia</a></li><li><a>Sejarah</a></li><li><a href="#">Visi &amp; Misi</a></li><li><a>Ketua Polis Negara</a></li><li><a>Pucuk Pimpinan</a></li><li><a>Piagam Pelanggan</a></li></ul></details></li>
+        <li><details><summary>Jabatan</summary><ul><li><a>JP</a></li><li><a>Cawangan Khas</a></li><li><a>JSJ</a></li><li><a>JKDNKA</a></li><li><a>JSJK</a></li><li><a>JSJN</a></li><li><a>JLT</a></li><li><a>JIPS</a></li><li><a>JPJKK</a></li><li><a>JSPT</a></li></ul></details></li>
+        <li><details><summary>Perkhidmatan</summary><ul><li><a>Semakan Saman Trafik</a></li><li><a>Status Laporan Polis</a></li><li><a>Aduan SISPAA</a></li><li><a>e-Reporting</a></li><li><a>e-Pengambilan</a></li></ul></details></li>
+        <li><details><summary>Program PDRM</summary><ul><li><a>AMANITA</a></li><li><a>GTSP</a></li><li><a>VSP</a></li><li><a>Ops Selamat</a></li></ul></details></li>
+        <li><details><summary>Media</summary><ul><li><a>Berita Semasa</a></li><li><a>Kenyataan Media</a></li><li><a>Galeri</a></li></ul></details></li>
+        <li><details><summary>Hubungi</summary><ul><li><a href="hubungi-kami.html">Hubungi Kami</a></li><li><a>Direktori Balai</a></li><li><a>Soalan Lazim</a></li></ul></details></li>
+      </ul>
+      <div class="grid gap-2 p-4">
+        <a href="tel:999" class="btn border-0 bg-red text-white">Kecemasan 999</a>
+        <a href="#" class="btn btn-primary">Buat Laporan</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+<!-- ============ HERO (banner foto penuh) ============ -->
+<section class="bg-royal-900 relative isolate overflow-hidden text-white">
+  <img src="https://rmp2u.rmp.gov.my/assets/images/pdrm-footer-bg.webp" alt="Barisan anggota PDRM dalam perbarisan" class="absolute inset-0 -z-10 h-full w-full object-cover object-left opacity-80" />
+  <div class="from-royal-900 via-royal-900/85 to-royal-900/60 absolute inset-0 -z-10 bg-linear-to-r"></div>
+  <div class="from-royal-900 absolute inset-x-0 bottom-0 -z-10 h-40 bg-linear-to-t to-transparent"></div>
+
+  <div class="container grid items-center gap-12 py-16 lg:grid-cols-12 lg:py-24">
+    <div class="lg:col-span-8">
+      <h1 class="text-4xl leading-[1.08] font-extrabold sm:text-5xl lg:text-[3.6rem]">
+        Polis dan Masyarakat
+        <span class="relative mt-1 block w-fit">
+          <span class="text-gold">Berpisah Tiada.</span>
+          <svg class="absolute -bottom-3 left-0 w-full" viewBox="0 0 300 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 9C60 3 160 1 298 7" stroke="#b3121f" stroke-width="4" stroke-linecap="round"/></svg>
+        </span>
+      </h1>
+      <p class="mt-7 max-w-xl text-white/80 md:text-lg">Komitmen kami demi keselamatan dan kesejahteraan negara. Buat laporan, semak saman dan dapatkan maklumat keselamatan — semuanya dalam satu portal.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#" class="btn btn-secondary btn-lg rounded-full border-0 px-6 shadow-lg shadow-black/30">
+          <iconify-icon icon="lucide:file-pen" class="text-xl"></iconify-icon> e-Reporting
+        </a>
+        <a href="#" class="btn btn-lg rounded-full border-white/30 bg-white/5 px-6 text-white shadow-none backdrop-blur hover:bg-white/15">
+          <iconify-icon icon="lucide:receipt-text" class="text-xl"></iconify-icon> Semak Saman
+        </a>
+      </div>
+    </div>
+
+  </div>
+  <!-- Ticker TERKINI (lebar penuh, di bawah banner) -->
+  <div class="bg-red relative flex items-stretch text-white">
+    <span class="bg-gold text-royal-900 flex flex-none items-center gap-2 px-5 text-xs font-extrabold tracking-wider uppercase sm:px-8"><iconify-icon icon="lucide:megaphone" class="text-base"></iconify-icon> Terkini</span>
+    <div class="relative flex-1 overflow-hidden py-3">
+      <div class="marquee gap-10 text-sm font-medium whitespace-nowrap">
+        <span>Perlawanan Persahabatan Golf &amp; Boling Tenpin PDRM–ATM 2026</span><span class="text-gold">◆</span>
+        <span>Perutusan Sambutan Deepavali Ketua Polis Negara</span><span class="text-gold">◆</span>
+        <span>Pelupusan 19 Barangan Berharga Rampasan di bawah AMLATFPUAA 2001</span><span class="text-gold">◆</span>
+        <span>Hari Polis Ke-219: Ayuh Sertai PDRM Fun Run 2026</span><span class="text-gold">◆</span>
+        <span>Perlawanan Persahabatan Golf &amp; Boling Tenpin PDRM–ATM 2026</span><span class="text-gold">◆</span>
+        <span>Perutusan Sambutan Deepavali Ketua Polis Negara</span><span class="text-gold">◆</span>
+        <span>Pelupusan 19 Barangan Berharga Rampasan di bawah AMLATFPUAA 2001</span><span class="text-gold">◆</span>
+        <span>Hari Polis Ke-219: Ayuh Sertai PDRM Fun Run 2026</span><span class="text-gold">◆</span>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ============ PERSONALISASI (Orang Awam / Warga PDRM) ============ -->
+<section class="container pt-10">
+  <div class="grid gap-4 md:grid-cols-2">
+    <a href="#" class="bg-royal group relative flex min-h-60 overflow-hidden rounded-[1.75rem] p-7 text-white sm:p-9">
+      <img src="https://rmp2u.rmp.gov.my/media/48163" alt="" class="absolute inset-0 h-full w-full object-cover opacity-35 transition duration-700 group-hover:scale-105" />
+      <span class="from-royal-900 via-royal-900/75 absolute inset-0 bg-linear-to-r to-transparent"></span>
+      <span class="bg-gold absolute inset-y-0 left-0 w-1.5"></span>
+      <span class="relative flex flex-col justify-between gap-6">
+        <span>
+          <span class="text-gold text-xs font-bold tracking-[0.18em] uppercase">Personalisasi</span>
+          <span class="font-heading mt-2 block text-2xl font-extrabold sm:text-3xl">Orang Awam</span>
+          <span class="mt-2 block max-w-sm text-sm text-white/75">Laporan polis, saman trafik, info keselamatan, kanak-kanak hilang dan direktori balai.</span>
+        </span>
+        <span class="text-royal-900 group-hover:bg-gold inline-flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold transition">Teroka <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
+      </span>
+      <iconify-icon icon="lucide:users-round" class="absolute right-6 bottom-6 text-6xl text-white/15"></iconify-icon>
+    </a>
+    <a href="#" class="bg-gold text-royal-900 group relative flex min-h-60 overflow-hidden rounded-[1.75rem] p-7 sm:p-9">
+      <img src="https://rmp2u.rmp.gov.my/media/48174" alt="" class="absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-multiply transition duration-700 group-hover:scale-105" />
+      <span class="from-gold via-gold/80 absolute inset-0 bg-linear-to-r to-transparent"></span>
+      <span class="bg-red absolute inset-y-0 left-0 w-1.5"></span>
+      <span class="relative flex flex-col justify-between gap-6">
+        <span>
+          <span class="text-royal-900/70 text-xs font-bold tracking-[0.18em] uppercase">Personalisasi</span>
+          <span class="font-heading mt-2 block text-2xl font-extrabold sm:text-3xl">Warga PDRM</span>
+          <span class="text-royal-900/75 mt-2 block max-w-sm text-sm">Emel PDRM, e-Penyata Gaji, e-Pesara, pekeliling dan sistem dalaman warga.</span>
+        </span>
+        <span class="bg-royal-900 group-hover:bg-royal inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-white transition">Log Masuk Warga <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
+      </span>
+      <iconify-icon icon="lucide:badge-check" class="text-royal-900/15 absolute right-6 bottom-6 text-6xl"></iconify-icon>
+    </a>
+  </div>
+</section>
+<!-- ============ PERKHIDMATAN (grid bento) ============ -->
+<section id="perkhidmatan" class="container py-10 md:py-14">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <span class="eyebrow">Perkhidmatan Dalam Talian</span>
+      <h2 class="mt-3 text-3xl font-bold sm:text-4xl">Urusan Tanpa ke Balai</h2>
+      <p class="text-base-content/70 mt-3 max-w-lg">Perkhidmatan dalam talian PDRM untuk orang awam, boleh diakses 24 jam sehari.</p>
+    </div>
+    <a href="#" class="btn btn-ghost text-royal rounded-full">Semua perkhidmatan <iconify-icon icon="lucide:arrow-right"></iconify-icon></a>
+  </div>
+
+  <div class="mt-10 grid auto-rows-[minmax(180px,auto)] gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <!-- Besar: e-Reporting -->
+    <a href="#" class="bg-royal group relative flex flex-col justify-between overflow-hidden rounded-[1.5rem] p-7 text-white md:col-span-2 lg:row-span-2">
+      <div class="hero-pattern absolute inset-0"></div>
+      <iconify-icon icon="lucide:file-pen-line" class="absolute -right-6 -bottom-6 text-[200px] text-white/5 transition duration-500 group-hover:-rotate-6 group-hover:text-white/10"></iconify-icon>
+      <div class="relative">
+        <span class="bg-gold text-royal-900 inline-flex size-14 items-center justify-center rounded-2xl"><iconify-icon icon="lucide:file-pen-line" class="text-3xl"></iconify-icon></span>
+        <span class="badge ms-2 border-0 bg-red align-top text-white">Paling Popular</span>
+      </div>
+      <div class="relative mt-10">
+        <p class="font-heading text-3xl font-bold">e-Reporting</p>
+        <p class="mt-2 max-w-sm text-white/75">Buat laporan polis dalam talian bagi kes kehilangan dokumen dan kes tertentu tanpa perlu hadir ke balai.</p>
+        <span class="bg-gold text-royal-900 mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition group-hover:gap-3">Buat laporan <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
+      </div>
+    </a>
+    <!-- Emas: Saman -->
+    <a href="#" class="bg-gold text-royal-900 group relative flex flex-col justify-between overflow-hidden rounded-[1.5rem] p-6 md:col-span-2">
+      <iconify-icon icon="lucide:car-front" class="absolute -right-4 -bottom-8 text-[150px] text-royal-900/10 transition duration-500 group-hover:translate-x-2"></iconify-icon>
+      <span class="bg-royal inline-flex size-12 items-center justify-center rounded-2xl text-white"><iconify-icon icon="lucide:car-front" class="text-2xl"></iconify-icon></span>
+      <div class="relative mt-6">
+        <p class="font-heading text-2xl font-bold">Semakan Saman Trafik</p>
+        <p class="mt-1 max-w-sm text-sm text-royal-900/75">Semak dan jelaskan saman trafik anda melalui MyBayar.</p>
+      </div>
+      <iconify-icon icon="lucide:arrow-up-right" class="absolute top-6 right-6 text-2xl transition group-hover:rotate-45"></iconify-icon>
+    </a>
+    <!-- Kad putih kecil -->
+    <a href="#" class="group bg-base-200 hover:bg-base-100 hover:border-royal/30 relative flex flex-col justify-between rounded-[1.5rem] border border-transparent p-6 transition hover:shadow-xl hover:shadow-royal/10">
+      <span class="bg-base-100 text-royal group-hover:bg-royal inline-flex size-12 items-center justify-center rounded-2xl transition group-hover:text-white"><iconify-icon icon="lucide:file-search" class="text-2xl"></iconify-icon></span>
+      <div class="mt-5"><p class="font-heading text-lg font-semibold">Status Laporan</p><p class="text-base-content/65 mt-1 text-sm">Semak melalui Sistem Semakan Online (SSO).</p></div>
+      <iconify-icon icon="lucide:arrow-up-right" class="text-base-content/30 group-hover:text-red absolute top-6 right-6 text-xl transition"></iconify-icon>
+    </a>
+    <a href="#" class="group bg-base-200 hover:bg-base-100 hover:border-royal/30 relative flex flex-col justify-between rounded-[1.5rem] border border-transparent p-6 transition hover:shadow-xl hover:shadow-royal/10">
+      <span class="bg-base-100 text-royal group-hover:bg-royal inline-flex size-12 items-center justify-center rounded-2xl transition group-hover:text-white"><iconify-icon icon="lucide:message-square-warning" class="text-2xl"></iconify-icon></span>
+      <div class="mt-5"><p class="font-heading text-lg font-semibold">Aduan SISPAA</p><p class="text-base-content/65 mt-1 text-sm">Salurkan aduan, cadangan atau penghargaan.</p></div>
+      <iconify-icon icon="lucide:arrow-up-right" class="text-base-content/30 group-hover:text-red absolute top-6 right-6 text-xl transition"></iconify-icon>
+    </a>
+    <!-- Merah: Semak Mule -->
+    <a href="#" class="bg-red group relative flex flex-col justify-between overflow-hidden rounded-[1.5rem] p-6 text-white">
+      <iconify-icon icon="lucide:shield-alert" class="absolute -right-5 -bottom-5 text-[120px] text-white/10"></iconify-icon>
+      <span class="inline-flex size-12 items-center justify-center rounded-2xl bg-white/15"><iconify-icon icon="lucide:shield-alert" class="text-2xl"></iconify-icon></span>
+      <div class="relative mt-5"><p class="font-heading text-lg font-semibold">Semak Mule</p><p class="mt-1 text-sm text-white/80">Semak akaun bank &amp; nombor telefon sebelum bayar.</p></div>
+    </a>
+    <a href="#" class="group bg-base-200 hover:bg-base-100 hover:border-royal/30 relative flex flex-col justify-between rounded-[1.5rem] border border-transparent p-6 transition hover:shadow-xl hover:shadow-royal/10">
+      <span class="bg-base-100 text-royal group-hover:bg-royal inline-flex size-12 items-center justify-center rounded-2xl transition group-hover:text-white"><iconify-icon icon="lucide:user-round-plus" class="text-2xl"></iconify-icon></span>
+      <div class="mt-5"><p class="font-heading text-lg font-semibold">e-Pengambilan PDRM</p><p class="text-base-content/65 mt-1 text-sm">Mohon jawatan &amp; ikuti status pengambilan.</p></div>
+      <iconify-icon icon="lucide:arrow-up-right" class="text-base-content/30 group-hover:text-red absolute top-6 right-6 text-xl transition"></iconify-icon>
+    </a>
+    <a href="#" class="group bg-base-200 hover:bg-base-100 hover:border-royal/30 relative flex flex-col justify-between rounded-[1.5rem] border border-transparent p-6 transition hover:shadow-xl hover:shadow-royal/10">
+      <span class="bg-base-100 text-royal group-hover:bg-royal inline-flex size-12 items-center justify-center rounded-2xl transition group-hover:text-white"><iconify-icon icon="lucide:smartphone" class="text-2xl"></iconify-icon></span>
+      <div class="mt-5"><p class="font-heading text-lg font-semibold">Volunteer Smartphone Patrol</p><p class="text-base-content/65 mt-1 text-sm">Salurkan maklumat jenayah dari telefon pintar.</p></div>
+      <iconify-icon icon="lucide:arrow-up-right" class="text-base-content/30 group-hover:text-red absolute top-6 right-6 text-xl transition"></iconify-icon>
+    </a>
+    <a href="#" class="group bg-base-200 hover:bg-base-100 hover:border-royal/30 relative flex flex-col justify-between rounded-[1.5rem] border border-transparent p-6 transition hover:shadow-xl hover:shadow-royal/10">
+      <span class="bg-base-100 text-royal group-hover:bg-royal inline-flex size-12 items-center justify-center rounded-2xl transition group-hover:text-white"><iconify-icon icon="lucide:gavel" class="text-2xl"></iconify-icon></span>
+      <div class="mt-5"><p class="font-heading text-lg font-semibold">Perolehan &amp; Tender</p><p class="text-base-content/65 mt-1 text-sm">Notis tender, sebut harga &amp; pelupusan aset.</p></div>
+      <iconify-icon icon="lucide:arrow-up-right" class="text-base-content/30 group-hover:text-red absolute top-6 right-6 text-xl transition"></iconify-icon>
+    </a>
+  </div>
+</section>
+
+<!-- ============ BERITA (kad 3 lajur, gaya LKIM-3) ============ -->
+<section class="bg-base-200 py-10 md:py-14">
+  <div class="container">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <span class="eyebrow">Terkini</span>
+        <h2 class="mt-3 text-3xl font-bold sm:text-4xl">Berita Terkini</h2>
+        <p class="text-base-content/70 mt-3 max-w-lg">Ikuti perkembangan terbaharu aktiviti, operasi dan program PDRM.</p>
+      </div>
+      <a href="#" class="text-royal hover:text-red inline-flex items-center gap-1.5 text-sm font-bold transition">Lihat Semua Berita <iconify-icon icon="lucide:arrow-right"></iconify-icon></a>
+    </div>
+
+    <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <article class="bg-base-100 border-base-300 group overflow-hidden rounded-2xl border transition hover:-translate-y-1 hover:shadow-xl hover:shadow-royal/10">
+        <div class="relative h-48 overflow-hidden bg-linear-to-br from-royal to-royal-900">
+          <span class="text-royal-900 absolute top-3.5 left-3.5 z-10 rounded-full bg-white px-3 py-1 text-[11.5px] font-bold">Antarabangsa</span>
+          <img src="https://rmp2u.rmp.gov.my/media/48174" alt="" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        </div>
+        <div class="px-6 pt-5 pb-6">
+          <p class="text-base-content/55 flex items-center gap-2 text-[12.5px]"><iconify-icon icon="lucide:calendar" class="text-sm"></iconify-icon>18 Sep 2026</p>
+          <h3 class="mt-2.5 line-clamp-2 text-base leading-snug font-semibold">KPN Terima Kunjungan Hormat Timbalan Ketua Polis Negara Thailand</h3>
+          <a href="#" class="text-red mt-3.5 inline-flex items-center gap-1.5 text-[13.5px] font-bold">Baca Selanjutnya <iconify-icon icon="lucide:arrow-right" class="transition group-hover:translate-x-1"></iconify-icon></a>
+        </div>
+      </article>
+      <article class="bg-base-100 border-base-300 group overflow-hidden rounded-2xl border transition hover:-translate-y-1 hover:shadow-xl hover:shadow-royal/10">
+        <div class="relative h-48 overflow-hidden bg-linear-to-br from-gold to-gold-600">
+          <span class="text-royal-900 absolute top-3.5 left-3.5 z-10 rounded-full bg-white px-3 py-1 text-[11.5px] font-bold">Komuniti</span>
+          <img src="https://rmp2u.rmp.gov.my/media/48163" alt="" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        </div>
+        <div class="px-6 pt-5 pb-6">
+          <p class="text-base-content/55 flex items-center gap-2 text-[12.5px]"><iconify-icon icon="lucide:calendar" class="text-sm"></iconify-icon>18 Sep 2026</p>
+          <h3 class="mt-2.5 line-clamp-2 text-base leading-snug font-semibold">Hari Polis Ke-219: Ayuh Sertai PDRM Fun Run 2026</h3>
+          <a href="#" class="text-red mt-3.5 inline-flex items-center gap-1.5 text-[13.5px] font-bold">Baca Selanjutnya <iconify-icon icon="lucide:arrow-right" class="transition group-hover:translate-x-1"></iconify-icon></a>
+        </div>
+      </article>
+      <article class="bg-base-100 border-base-300 group overflow-hidden rounded-2xl border transition hover:-translate-y-1 hover:shadow-xl hover:shadow-royal/10">
+        <div class="relative h-48 overflow-hidden bg-linear-to-br from-red to-red-700">
+          <span class="text-royal-900 absolute top-3.5 left-3.5 z-10 rounded-full bg-white px-3 py-1 text-[11.5px] font-bold">Operasi</span>
+          <img src="https://rmp2u.rmp.gov.my/media/48226" alt="" class="h-full w-full object-cover object-top transition duration-500 group-hover:scale-105" />
+        </div>
+        <div class="px-6 pt-5 pb-6">
+          <p class="text-base-content/55 flex items-center gap-2 text-[12.5px]"><iconify-icon icon="lucide:calendar" class="text-sm"></iconify-icon>05 Okt 2026</p>
+          <h3 class="mt-2.5 line-clamp-2 text-base leading-snug font-semibold">Whitening The Blackspot: Perkasa Pencegahan</h3>
+          <a href="#" class="text-red mt-3.5 inline-flex items-center gap-1.5 text-[13.5px] font-bold">Baca Selanjutnya <iconify-icon icon="lucide:arrow-right" class="transition group-hover:translate-x-1"></iconify-icon></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+<!-- ============ KENYATAAN & HEBAHAN (garis masa) ============ -->
+<section class="container py-10 md:py-14">
+  <div class="grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <span class="eyebrow">Makluman Rasmi</span>
+      <h2 class="mt-3 text-3xl font-bold sm:text-4xl">Kenyataan &amp; Hebahan</h2>
+      <p class="text-base-content/70 mt-3 max-w-md">Kenyataan media, pengumuman dan notis perolehan terkini daripada PDRM.</p>
+
+      <!-- Banner dalam bingkai emas -->
+      <div class="relative mt-8">
+        <div class="bg-gold absolute -inset-2 translate-x-3 translate-y-3 rounded-[1.5rem]"></div>
+        <div class="bg-base-100 relative overflow-hidden rounded-[1.25rem] ring-1 ring-base-300">
+          <div id="bannerTrack" class="no-scrollbar flex snap-x snap-mandatory overflow-x-auto">
+            <img src="https://www.rmp.gov.my/images/default-source/Banner-2024/ereporting.jpg?sfvrsn=0" alt="e-Reporting PDRM" class="w-full flex-none snap-center" />
+            <img src="https://www.rmp.gov.my/images/default-source/rotating-image/sistem-e-pengambilan-pdrm.jpg?sfvrsn=5" alt="Sistem e-Pengambilan PDRM" class="w-full flex-none snap-center" />
+            <img src="https://www.rmp.gov.my/images/default-source/rotating-image/kanak-kanak-hilang.jpg?sfvrsn=1" alt="Portal Kanak-kanak Hilang" class="w-full flex-none snap-center" />
+            <img src="https://www.rmp.gov.my/images/default-source/galeri-album-2020/banner-promosi-e-pesara-4.jpg?sfvrsn=1" alt="e-Pesara" class="w-full flex-none snap-center" />
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 flex items-center gap-2">
+        <button class="btn btn-circle btn-sm border-royal text-royal hover:bg-royal bg-transparent hover:text-white" data-banner="-1" aria-label="Sebelum"><iconify-icon icon="lucide:chevron-left"></iconify-icon></button>
+        <button class="btn btn-circle btn-sm btn-primary" data-banner="1" aria-label="Seterusnya"><iconify-icon icon="lucide:chevron-right"></iconify-icon></button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7">
+      <!-- Tab ringkas: garis bawah emas, tiada latar -->
+      <div id="hebahanTabs" role="tablist" class="border-base-300 flex gap-6 border-b">
+        <button type="button" role="tab" aria-selected="true" aria-controls="hb-1" class="hb-tab">Kenyataan Media</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="hb-2" class="hb-tab">Pengumuman</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="hb-3" class="hb-tab">Tender</button>
+      </div>
+
+      <div id="hb-1" role="tabpanel" class="hb-panel mt-7">
+        <ol class="border-base-300 relative border-s-2 border-dashed ps-8">
+          <li class="relative pb-7"><span class="bg-gold ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-base-content/60 text-sm"><span class="text-royal font-bold">17 Sep 2026</span> · Polis Daerah Kluang</p><p class="group-hover:text-royal mt-1 text-lg font-semibold">Makluman Kes Viral Kecurian Kabel</p></a></li>
+          <li class="relative pb-7"><span class="bg-base-300 ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-base-content/60 text-sm"><span class="text-royal font-bold">15 Sep 2026</span> · Kementerian Dalam Negeri</p><p class="group-hover:text-royal mt-1 text-lg font-semibold">Kenyataan Media Menteri Dalam Negeri</p></a></li>
+          <li class="relative"><span class="bg-red ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-base-content/60 text-sm"><span class="text-royal font-bold">09 Ogo 2026</span> · <span class="text-red font-semibold">Penafian</span></p><p class="group-hover:text-royal mt-1 text-lg font-semibold">PDRM Nafi Kenyataan Palsu Pemangku Timbalan KPN</p></a></li>
+        </ol>
+      </div>
+      <div id="hb-2" role="tabpanel" class="hb-panel mt-7" hidden>
+        <ol class="border-base-300 relative border-s-2 border-dashed ps-8">
+          <li class="relative pb-7"><span class="bg-gold ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-royal text-sm font-bold">07 Nov 2026</p><p class="group-hover:text-royal mt-1 text-lg font-semibold">Perlawanan Persahabatan Golf &amp; Boling Tenpin PDRM–ATM 2026</p></a></li>
+          <li class="relative pb-7"><span class="bg-base-300 ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-royal text-sm font-bold">06 Nov 2026</p><p class="group-hover:text-royal mt-1 text-lg font-semibold">Perutusan Sambutan Deepavali Ketua Polis Negara</p></a></li>
+          <li class="relative"><span class="bg-base-300 ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-royal text-sm font-bold">27 Nov 2025</p><p class="group-hover:text-royal mt-1 text-lg font-semibold">Berita Bukit Aman Bil. 3 2025 Kini Diterbitkan</p></a></li>
+        </ol>
+      </div>
+      <div id="hb-3" role="tabpanel" class="hb-panel mt-7" hidden>
+        <ol class="border-base-300 relative border-s-2 border-dashed ps-8">
+          <li class="relative"><span class="bg-red ring-base-100 absolute -start-[41px] top-1 size-4 rounded-full ring-4"></span><a href="#" class="group block"><p class="text-sm"><span class="badge badge-sm bg-red/10 text-red border-0 font-semibold">Pelupusan</span> <span class="text-royal font-bold">10 Ogo 2026</span></p><p class="group-hover:text-royal mt-1 text-lg font-semibold">Pelupusan 19 Barangan Berharga Rampasan di bawah AMLATFPUAA 2001</p></a></li>
+        </ol>
+      </div>
+      <a href="#" class="text-royal mt-8 inline-flex items-center gap-2 font-bold transition-all hover:gap-3">Lihat semua makluman <iconify-icon icon="lucide:arrow-right"></iconify-icon></a>
+    </div>
+  </div>
+</section>
+<!-- ============ NUR ALERT + SEMAK MULE (reka bentuk baharu) ============ -->
+<section class="container pb-10 md:pb-14">
+  <div class="grid gap-6 lg:grid-cols-5">
+    <!-- Nur Alert: kad "notis hilang" dengan jalur pita amaran -->
+    <article class="bg-base-100 border-base-300 relative overflow-hidden rounded-[1.75rem] border lg:col-span-2">
+      <div class="h-3 bg-[repeating-linear-gradient(135deg,#b3121f_0_14px,#ffffff_14px_28px)]"></div>
+      <div class="p-7">
+        <div class="flex items-center justify-between">
+          <span class="bg-red/10 text-red inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-extrabold tracking-wider">
+            <span class="relative flex size-2"><span class="bg-red absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span><span class="bg-red relative inline-flex size-2 rounded-full"></span></span>
+            NUR ALERT
+          </span>
+          <iconify-icon icon="lucide:user-search" class="text-red/25 text-4xl"></iconify-icon>
+        </div>
+        <h3 class="mt-4 text-2xl font-bold">Individu Dilaporkan Hilang</h3>
+        <p class="text-base-content/70 mt-2 text-sm">Bantu kami membawa mereka pulang. Ada maklumat? Hubungi balai polis berhampiran atau pegawai penyiasat.</p>
+        <div class="mt-5 flex items-center gap-4 rounded-2xl bg-base-200 p-3">
+          <img src="https://rmp2u.rmp.gov.my/assets/images/rmp.webp" alt="" class="size-16 flex-none rounded-xl object-cover" />
+          <div class="text-sm">
+            <p class="text-base-content/60 text-xs">Salurkan maklumat</p>
+            <p class="font-heading text-red text-xl font-bold">999</p>
+          </div>
+          <a href="#" class="btn btn-sm bg-red hover:bg-red-700 ms-auto rounded-full border-0 text-white">Lihat senarai</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Semak Mule: borang semakan terus -->
+    <article class="bg-royal-900 relative overflow-hidden rounded-[1.75rem] p-7 text-white sm:p-9 lg:col-span-3">
+      <div class="hero-pattern absolute inset-0"></div>
+      <div class="bg-gold/20 absolute -top-24 -right-24 size-72 rounded-full blur-3xl"></div>
+      <div class="relative">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="bg-gold text-royal-900 inline-flex size-12 items-center justify-center rounded-2xl"><iconify-icon icon="lucide:shield-check" class="text-2xl"></iconify-icon></span>
+          <div>
+            <p class="text-gold text-xs font-bold tracking-wider uppercase">Semak Mule · JSJK CCID</p>
+            <h3 class="text-2xl font-bold">Semak Sebelum Bayar</h3>
+          </div>
+        </div>
+        <p class="mt-4 max-w-lg text-sm text-white/75">Elakkan menjadi mangsa penipuan. Semak akaun bank, nombor telefon atau nama syarikat sebelum membuat sebarang bayaran.</p>
+        <a href="#" class="btn bg-red hover:bg-red-700 mt-6 rounded-full border-0 px-7 text-white shadow-lg shadow-black/30"><iconify-icon icon="lucide:shield-check" class="text-lg"></iconify-icon> Semak Sekarang</a>
+        <p class="mt-4 flex items-center gap-2 text-xs text-white/60"><iconify-icon icon="lucide:phone" class="text-gold"></iconify-icon> Disyaki scam? Hubungi Pusat Respons Scam Kebangsaan <b class="text-gold">997</b></p>
+      </div>
+    </article>
+  </div>
+</section>
+<!-- ============ MEDIA SOSIAL (latar biru) ============ -->
+<section class="bg-royal-900 relative overflow-hidden py-14 text-white md:py-20">
+  <div class="relative container">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <span class="eyebrow !text-gold before:!bg-gold">#PDRMsiaga</span>
+        <h2 class="mt-3 text-3xl font-bold sm:text-4xl">Ikuti Kisah Media Sosial Kami</h2>
+        <p class="mt-3 max-w-lg text-white/70">Info semasa, kempen keselamatan dan aktiviti PDRM di seluruh negara.</p>
+      </div>
+      <div id="sosialFilter" class="flex flex-wrap items-center gap-1 rounded-full bg-white/10 p-1">
+        <button type="button" data-filter="all" class="sosial-filter bg-gold text-royal-900 rounded-full px-4 py-1.5 text-sm font-bold">Semua</button>
+        <button type="button" data-filter="facebook" aria-label="Facebook" class="sosial-filter inline-flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10"><iconify-icon icon="ri:facebook-fill"></iconify-icon></button>
+        <button type="button" data-filter="instagram" aria-label="Instagram" class="sosial-filter inline-flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10"><iconify-icon icon="ri:instagram-line"></iconify-icon></button>
+        <button type="button" data-filter="x" aria-label="X" class="sosial-filter inline-flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon></button>
+        <button type="button" data-filter="youtube" aria-label="YouTube" class="sosial-filter inline-flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10"><iconify-icon icon="ri:youtube-fill"></iconify-icon></button>
+        <button type="button" data-filter="tiktok" aria-label="TikTok" class="sosial-filter inline-flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10"><iconify-icon icon="ri:tiktok-fill"></iconify-icon></button>
+      </div>
+    </div>
+    <div id="sosialGrid" class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <a href="#" data-platform="facebook" class="sosial-tile group relative block overflow-hidden rounded-2xl">
+        <img src="images/sosial/pdrm-sosial-1.jpg" alt="Satu gambar, banyak maklumat terdedah" class="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-105" />
+        <span class="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-royal-900 opacity-0 transition group-hover:opacity-100"><iconify-icon icon="ri:facebook-fill" class="text-[#1877F2] text-base"></iconify-icon> Lihat di Facebook</span>
+      </a>
+      <a href="#" data-platform="tiktok" class="sosial-tile group relative block overflow-hidden rounded-2xl">
+        <img src="images/sosial/pdrm-sosial-2.jpg" alt="Kesihatan Mental" class="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-105" />
+        <span class="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-royal-900 opacity-0 transition group-hover:opacity-100"><iconify-icon icon="ri:tiktok-fill" class="text-base"></iconify-icon> Lihat di TikTok</span>
+      </a>
+      <a href="#" data-platform="instagram" class="sosial-tile group relative block overflow-hidden rounded-2xl">
+        <img src="images/sosial/pdrm-sosial-3.jpg" alt="Selamat Menyambut Hari Deepavali" class="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-105" />
+        <span class="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-royal-900 opacity-0 transition group-hover:opacity-100"><iconify-icon icon="ri:instagram-line" class="text-[#dd2a7b] text-base"></iconify-icon> Lihat di Instagram</span>
+      </a>
+      <a href="#" data-platform="x" class="sosial-tile group relative block overflow-hidden rounded-2xl">
+        <img src="images/sosial/pdrm-sosial-4.jpg" alt="Hari Deepavali: 6,395 anggota digerakkan" class="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-105" />
+        <span class="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-royal-900 opacity-0 transition group-hover:opacity-100"><iconify-icon icon="ri:twitter-x-fill" class="text-base"></iconify-icon> Lihat di X</span>
+      </a>
+      <a href="#" data-platform="youtube" class="sosial-tile group relative block overflow-hidden rounded-2xl">
+        <img src="images/sosial/pdrm-sosial-5.jpg" alt="Timbalan KPN hadir Program Semarak Kebudayaan" class="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-105" />
+        <span class="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-royal-900 opacity-0 transition group-hover:opacity-100"><iconify-icon icon="ri:youtube-fill" class="text-[#FF0000] text-base"></iconify-icon> Lihat di YouTube</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOALAN LAZIM ============ -->
+<section class="container py-10 md:py-14">
+  <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+    <div class="lg:col-span-4">
+      <span class="eyebrow">Bantuan</span>
+      <h2 class="mt-3 text-3xl font-bold sm:text-4xl">Soalan Lazim</h2>
+      <p class="text-base-content/70 mt-3">Tidak jumpa jawapan? Hubungi balai polis berhampiran atau Ibu Pejabat PDRM.</p>
+      <div class="bg-base-200 mt-6 rounded-2xl p-5">
+        <p class="text-base-content/60 text-sm">Talian Ibu Pejabat</p>
+        <p class="font-heading text-royal mt-1 text-2xl font-bold">03-2266 2222</p>
+        <div class="mt-4 flex gap-2">
+          <a href="#" class="btn btn-sm btn-primary rounded-full">Hubungi Kami</a>
+          <a href="#" class="btn btn-sm btn-ghost rounded-full">Semua soalan</a>
+        </div>
+      </div>
+    </div>
+    <div class="space-y-3 lg:col-span-8">
+      <div class="group collapse collapse-arrow bg-base-100 border-base-300 rounded-2xl border has-[:checked]:border-royal has-[:checked]:bg-base-200">
+        <input type="radio" name="faq" checked aria-label="Soalan 1" />
+        <div class="collapse-title flex items-center gap-4 font-semibold sm:text-lg"><span class="font-heading bg-royal/10 text-royal group-has-[:checked]:bg-gold group-has-[:checked]:text-royal-900 inline-flex size-8 flex-none items-center justify-center rounded-full text-sm font-bold transition">01</span>Bagaimana untuk membuat laporan polis?</div>
+        <div class="collapse-content text-base-content/70 ps-16 text-sm">Laporan boleh dibuat di mana-mana balai polis. Bagi kes tertentu seperti kehilangan dokumen, laporan boleh dibuat secara dalam talian melalui e-Reporting.</div>
+      </div>
+      <div class="group collapse collapse-arrow bg-base-100 border-base-300 rounded-2xl border has-[:checked]:border-royal has-[:checked]:bg-base-200">
+        <input type="radio" name="faq" aria-label="Soalan 2" />
+        <div class="collapse-title flex items-center gap-4 font-semibold sm:text-lg"><span class="font-heading bg-royal/10 text-royal group-has-[:checked]:bg-gold group-has-[:checked]:text-royal-900 inline-flex size-8 flex-none items-center justify-center rounded-full text-sm font-bold transition">02</span>Bagaimana menyemak status laporan saya?</div>
+        <div class="collapse-content text-base-content/70 ps-16 text-sm">Gunakan Sistem Semakan Online (SSO) dengan memasukkan nombor laporan dan nombor kad pengenalan anda.</div>
+      </div>
+      <div class="group collapse collapse-arrow bg-base-100 border-base-300 rounded-2xl border has-[:checked]:border-royal has-[:checked]:bg-base-200">
+        <input type="radio" name="faq" aria-label="Soalan 3" />
+        <div class="collapse-title flex items-center gap-4 font-semibold sm:text-lg"><span class="font-heading bg-royal/10 text-royal group-has-[:checked]:bg-gold group-has-[:checked]:text-royal-900 inline-flex size-8 flex-none items-center justify-center rounded-full text-sm font-bold transition">03</span>Di mana saya boleh menyemak dan membayar saman trafik?</div>
+        <div class="collapse-content text-base-content/70 ps-16 text-sm">Saman trafik PDRM boleh disemak dan dibayar melalui portal MyBayar atau di kaunter balai polis.</div>
+      </div>
+      <div class="group collapse collapse-arrow bg-base-100 border-base-300 rounded-2xl border has-[:checked]:border-royal has-[:checked]:bg-base-200">
+        <input type="radio" name="faq" aria-label="Soalan 4" />
+        <div class="collapse-title flex items-center gap-4 font-semibold sm:text-lg"><span class="font-heading bg-royal/10 text-royal group-has-[:checked]:bg-gold group-has-[:checked]:text-royal-900 inline-flex size-8 flex-none items-center justify-center rounded-full text-sm font-bold transition">04</span>Saya disyaki menjadi mangsa scam. Apa perlu dilakukan?</div>
+        <div class="collapse-content text-base-content/70 ps-16 text-sm">Hubungi Pusat Respons Scam Kebangsaan di talian <b class="text-red">997</b> dengan segera, kemudian buat laporan polis di balai berhampiran.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAKLUM BALAS (CTA emas) ============ -->
+<section class="container pb-10 md:pb-14">
+  <div class="relative overflow-hidden rounded-[2rem] bg-[#dba200]">
+    <div class="bg-royal absolute top-0 right-0 hidden h-full w-[38%] [clip-path:polygon(18%_0,100%_0,100%_100%,0_100%)] lg:block"></div>
+    <div class="bg-red absolute top-0 right-[36%] hidden h-full w-3 skew-x-[-10deg] lg:block"></div>
+    <div class="relative grid gap-8 p-8 sm:p-10 lg:grid-cols-12 lg:items-center lg:p-14">
+      <div class="text-royal-900 lg:col-span-7">
+        <h2 class="text-3xl leading-tight font-extrabold sm:text-4xl">Suara Anda,<br />Keutamaan Kami.</h2>
+        <p class="mt-3 max-w-lg text-royal-900/75">Setiap cadangan, aduan dan penghargaan membantu PDRM memberi perkhidmatan yang lebih baik kepada rakyat.</p>
+        <div class="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
+          <span class="flex items-center gap-2"><iconify-icon icon="lucide:clock-3" class="text-red text-lg"></iconify-icon> Dibuka 24 jam</span>
+          <span class="flex items-center gap-2"><iconify-icon icon="lucide:lock-keyhole" class="text-red text-lg"></iconify-icon> Maklumat dirahsiakan</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row lg:col-span-5 lg:flex-col lg:items-end">
+        <a href="#" class="btn btn-lg bg-royal-900 hover:bg-royal rounded-full border-0 px-7 text-white shadow-xl lg:w-72">
+          <iconify-icon icon="lucide:message-square-heart" class="text-gold text-xl"></iconify-icon> Beri Maklum Balas
+        </a>
+        <a href="#" class="btn btn-lg bg-red hover:bg-red-700 rounded-full border-0 px-7 text-white lg:w-72">
+          <iconify-icon icon="lucide:message-square-warning" class="text-xl"></iconify-icon> Aduan SISPAA
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RAKAN STRATEGIK (marquee) ============ -->
+<section class="border-base-300 border-y bg-base-200 py-8">
+  <div class="container flex items-center gap-8">
+    <p class="text-royal flex-none text-sm font-bold tracking-wider uppercase max-md:hidden">Rakan<br />Strategik</p>
+    <div class="relative flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
+      <div class="marquee items-center gap-14">
+        <img src="https://rmp2u.rmp.gov.my/media/48109" alt="MyGov" title="MyGovernment" class="h-10 w-24 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48112" alt="KDN" title="Kementerian Dalam Negeri" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48110" alt="MKN" title="Majlis Keselamatan Negara" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48115" alt="KPWKM" title="KPWKM" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48118" alt="APAD" title="APAD" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48117" alt="SKMM" title="SKMM" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48111" alt="SPR" title="SPR" class="h-10 w-16 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48114" alt="JUPEM" title="JUPEM" class="h-10 w-16 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48109" alt="" aria-hidden="true" class="h-10 w-24 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48112" alt="" aria-hidden="true" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48110" alt="" aria-hidden="true" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48115" alt="" aria-hidden="true" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48118" alt="" aria-hidden="true" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48117" alt="" aria-hidden="true" class="h-10 w-20 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48111" alt="" aria-hidden="true" class="h-10 w-16 object-contain" />
+        <img src="https://rmp2u.rmp.gov.my/media/48114" alt="" aria-hidden="true" class="h-10 w-16 object-contain" />
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-royal-900 relative text-white">
+  <div class="tri-stripe"></div>
+  <div class="relative container pt-14">
+    <div class="grid grid-cols-2 gap-10 md:grid-cols-4 lg:grid-cols-12">
+      <div class="col-span-2 md:col-span-4 lg:col-span-4">
+        <div class="flex items-center gap-3">
+          <img src="https://rmp2u.rmp.gov.my/media/36685" alt="Logo PDRM" class="h-12 w-auto" />
+          <p class="font-heading text-lg leading-tight font-bold uppercase">Polis Diraja<br />Malaysia</p>
+        </div>
+        <p class="mt-5 max-w-sm text-sm text-white/65">Ibu Pejabat Polis Diraja Malaysia, Jalan Bukit Aman, Tasik Perdana, 50560 Bukit Aman, Kuala Lumpur.</p>
+        <div class="mt-4 space-y-1.5 text-sm">
+          <p class="flex items-center gap-2"><iconify-icon icon="lucide:phone" class="text-gold"></iconify-icon> +603-2266 2222</p>
+          <p class="flex items-center gap-2"><iconify-icon icon="lucide:mail" class="text-gold"></iconify-icon> rmp[at]rmp[dot]gov[dot]my</p>
+        </div>
+        <div class="mt-6 flex items-center gap-2">
+          <a href="#" class="btn btn-sm btn-circle hover:bg-gold hover:text-royal-900 border-0 bg-white/10 text-white" aria-label="Facebook"><iconify-icon icon="ri:facebook-fill"></iconify-icon></a>
+          <a href="#" class="btn btn-sm btn-circle hover:bg-gold hover:text-royal-900 border-0 bg-white/10 text-white" aria-label="X"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon></a>
+          <a href="#" class="btn btn-sm btn-circle hover:bg-gold hover:text-royal-900 border-0 bg-white/10 text-white" aria-label="Instagram"><iconify-icon icon="ri:instagram-line"></iconify-icon></a>
+          <a href="#" class="btn btn-sm btn-circle hover:bg-gold hover:text-royal-900 border-0 bg-white/10 text-white" aria-label="YouTube"><iconify-icon icon="ri:youtube-fill"></iconify-icon></a>
+          <a href="#" class="btn btn-sm btn-circle hover:bg-gold hover:text-royal-900 border-0 bg-white/10 text-white" aria-label="TikTok"><iconify-icon icon="ri:tiktok-fill"></iconify-icon></a>
+        </div>
+      </div>
+      <div class="lg:col-span-2 lg:col-start-6">
+        <p class="text-gold text-sm font-bold tracking-wider uppercase">Pautan</p>
+        <div class="mt-4 flex flex-col space-y-2 text-sm text-white/70 *:hover:text-white">
+          <a href="#">Piagam Pelanggan</a><a href="#">Info Kerjaya</a><a href="#">Data Terbuka</a><a href="#">Arkib Elektronik</a>
+        </div>
+      </div>
+      <div class="lg:col-span-2">
+        <p class="text-gold text-sm font-bold tracking-wider uppercase">Bantuan</p>
+        <div class="mt-4 flex flex-col space-y-2 text-sm text-white/70 *:hover:text-white">
+          <a href="#">Soalan Lazim</a><a href="#">Maklum Balas</a><a href="#">Peta Laman</a><a href="#">CIO / CDO Agensi</a>
+        </div>
+      </div>
+      <div class="col-span-2 md:col-span-2 lg:col-span-3 lg:col-start-10">
+        <p class="text-gold text-sm font-bold tracking-wider uppercase">Jumlah Pelawat</p>
+        <div class="mt-2 text-sm">
+          <div class="flex items-center justify-between border-b border-dashed border-white/15 py-2"><span class="text-white/65">Hari Ini</span><span class="font-semibold tabular-nums">1,453</span></div>
+          <div class="flex items-center justify-between border-b border-dashed border-white/15 py-2"><span class="text-white/65">Semalam</span><span class="font-semibold tabular-nums">523</span></div>
+          <div class="flex items-center justify-between border-b border-dashed border-white/15 py-2"><span class="text-white/65">Minggu Ini</span><span class="font-semibold tabular-nums">29,769</span></div>
+          <div class="flex items-center justify-between border-b border-dashed border-white/15 py-2"><span class="text-white/65">Bulan Ini</span><span class="font-semibold tabular-nums">8,643,689</span></div>
+          <div class="flex items-center justify-between border-b border-dashed border-white/15 py-2"><span class="text-white/65">Jumlah</span><span class="font-semibold tabular-nums">78,868,969</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 py-6 text-sm">
+      <p class="text-white/60">Hak Cipta © 2026 Polis Diraja Malaysia</p>
+      <p class="text-white/60"><a href="#" class="hover:text-gold">Penafian</a> · <a href="#" class="hover:text-gold">Dasar Privasi</a> · <a href="#" class="hover:text-gold">Dasar Keselamatan</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Butang kecemasan terapung (mudah alih) -->
+<a href="tel:999" class="bg-red fixed right-4 bottom-4 z-40 inline-flex size-14 items-center justify-center rounded-full text-white shadow-2xl shadow-red/40 md:hidden" aria-label="Kecemasan 999"><iconify-icon icon="lucide:siren" class="text-2xl"></iconify-icon></a>
+
+<!-- Modal carian -->
+<dialog id="searchModal" class="modal modal-top sm:modal-middle">
+  <div class="modal-box overflow-hidden rounded-2xl p-0">
+    <div class="tri-stripe"></div>
+    <label class="input input-lg w-full rounded-none border-0 border-b border-base-300 focus-within:outline-none">
+      <iconify-icon icon="lucide:search" class="text-royal"></iconify-icon>
+      <input type="search" placeholder="Cari perkhidmatan, berita, balai polis..." />
+    </label>
+    <div class="p-5">
+      <p class="text-red text-xs font-bold tracking-wider uppercase">Carian popular</p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <a href="#" class="badge badge-lg bg-base-200 hover:bg-gold border-0">Semak saman</a><a href="#" class="badge badge-lg bg-base-200 hover:bg-gold border-0">Laporan polis</a><a href="#" class="badge badge-lg bg-base-200 hover:bg-gold border-0">Semak Mule</a><a href="#" class="badge badge-lg bg-base-200 hover:bg-gold border-0">Balai berhampiran</a>
+      </div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>tutup</button></form>
+</dialog>
+</div><!-- /#a11y-root -->
+
+<script>
+  // Header: bayang apabila skrol
+  const topbar = document.getElementById('topbar');
+  const onScroll = () => topbar.dataset.scrolled = window.scrollY > 20;
+  window.addEventListener('scroll', onScroll); onScroll();
+
+  // Pintasan "/" untuk carian
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); document.getElementById('searchModal').showModal(); }
+  });
+
+  // Bahasa (visual) + bahasa panel kebolehcapaian
+  const langBtns = document.querySelectorAll('#langSwitch button');
+  langBtns.forEach(btn => btn.addEventListener('click', () => {
+    langBtns.forEach(b => { b.className = 'text-base-content/50 hover:text-royal rounded-full px-2.5 py-0.5'; b.setAttribute('aria-pressed', 'false'); });
+    btn.className = 'bg-royal rounded-full px-2.5 py-0.5 text-white'; btn.setAttribute('aria-pressed', 'true');
+    if (window.A11y) A11y.setLang(btn.textContent.trim() === 'EN' ? 'en' : 'ms');
+  }));
+
+  // Slaid banner
+  const track = document.getElementById('bannerTrack');
+  document.querySelectorAll('[data-banner]').forEach(b => b.addEventListener('click', () => track.scrollBy({ left: +b.dataset.banner * track.clientWidth, behavior: 'smooth' })));
+
+  // Tab Kenyataan & Hebahan
+  const hbTabs = document.querySelectorAll('#hebahanTabs [role=tab]');
+  hbTabs.forEach(t => t.addEventListener('click', () => {
+    hbTabs.forEach(x => { x.setAttribute('aria-selected', x === t); document.getElementById(x.getAttribute('aria-controls')).hidden = x !== t; });
+  }));
+
+  // Media sosial: tapis ikut platform
+  const filters = document.querySelectorAll('.sosial-filter');
+  filters.forEach(btn => btn.addEventListener('click', () => {
+    const f = btn.dataset.filter;
+    filters.forEach(b => { b.classList.remove('bg-gold', 'text-royal-900'); if (b.dataset.filter !== 'all') b.classList.add('text-white/80'); else b.classList.add('text-white'); });
+    btn.classList.add('bg-gold', 'text-royal-900'); btn.classList.remove('text-white/80', 'text-white');
+    document.querySelectorAll('.sosial-tile').forEach(t => t.classList.toggle('hidden', f !== 'all' && t.dataset.platform !== f));
+  }));
+
+  // Kenal pasti begini
+  const govToggle = document.getElementById('govToggle'), govInfo = document.getElementById('govInfo');
+  govToggle.addEventListener('click', () => {
+    const open = govToggle.getAttribute('aria-expanded') !== 'true';
+    govToggle.setAttribute('aria-expanded', open);
+    govInfo.dataset.open = open;
+  });
+</script>
+<!-- Fail kebolehcapaian -->
+<script src="accessibility/a11y.js" data-lang="ms" data-storage-key="pdrm-a11y" data-reader-hide="#sosialGrid,#sosialFilter" defer></script>
+</body>
+</html>

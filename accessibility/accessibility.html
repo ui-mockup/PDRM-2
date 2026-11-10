@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alat Kebolehcapaian — Reusable Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ---- Change these 6 variables to match any website ---- */
+  :root{
+    --a11y-primary:#1B2A5C; --a11y-primary-2:#2B3F8F; --a11y-accent:#F5C21B;
+    --a11y-blue:#3A4FB8; --a11y-soft:#EEF0FB; --a11y-font:'Poppins',system-ui,sans-serif;
+  }
+  body{margin:0;font-family:'Poppins',system-ui,sans-serif;color:#16193A;background:#F6F7FB;line-height:1.6}
+  .bar{background:var(--a11y-primary);color:#fff;padding:12px 24px;display:flex;justify-content:space-between;align-items:center}
+  .bar button{background:var(--a11y-accent);color:var(--a11y-primary);border:0;border-radius:999px;padding:10px 18px;font:600 14px 'Poppins',sans-serif;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .bar button svg{width:18px;height:18px}
+  .lang button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);padding:6px 12px;margin-left:6px}
+  main{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:34px;margin:0 0 8px}
+  h2{margin-top:40px}
+  pre{background:#16193A;color:#E6E8F0;padding:18px 20px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.5}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace}
+  p code,li code{background:#E6E8F0;padding:2px 6px;border-radius:4px;font-size:13px}
+  .card{background:#fff;border:1px solid #E6E8F0;border-radius:16px;padding:24px;margin-top:24px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:10px;border-bottom:1px solid #E6E8F0;vertical-align:top}
+  img{border-radius:12px;max-width:100%}
+</style>
+</head>
+<body>
+<div id="a11y-root">
+  <div class="bar">
+    <strong>Alat Kebolehcapaian · Demo</strong>
+    <div>
+      <button type="button" data-a11y-open>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="4.5" r="1.5"/><path d="M6 8.5l6 1.5 6-1.5M12 10v4.5l-3 6M12 14.5l3 6"/></svg>
+        Buka panel
+      </button>
+      <span class="lang"><button type="button" onclick="A11y.setLang('ms')">BM</button><button type="button" onclick="A11y.setLang('en')">EN</button></span>
+    </div>
+  </div>
+
+  <main>
+    <h1>Reusable accessibility panel</h1>
+    <p>This page is the standalone version of the accessibility tools. Copy the <code>accessibility</code> folder into any website project, add one button and one script tag, and the panel works the same way it does on the JAWHAR homepage.</p>
+
+    <div class="card">
+      <h2 style="margin-top:0">1. Add it to any page</h2>
+<pre><code>&lt;!-- wrap the content that should be affected --&gt;
+&lt;div id="a11y-root"&gt;
+  ...your header, main, footer...
+
+  &lt;!-- any element with data-a11y-open opens the panel --&gt;
+  &lt;button type="button" data-a11y-open aria-label="Accessibility"&gt;♿&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script src="accessibility/a11y.js"
+        data-lang="ms"
+        data-storage-key="mysite-a11y" defer&gt;&lt;/script&gt;</code></pre>
+
+      <h2>2. Match the website's colours</h2>
+<pre><code>:root{
+  --a11y-primary:#0E1E5B;   /* header + text   */
+  --a11y-primary-2:#1F3A8A; /* header gradient */
+  --a11y-accent:#F8B400;    /* yellow line, active dot, focus */
+  --a11y-blue:#1D4ED8;      /* icons + active border */
+  --a11y-soft:#EEF3FF;      /* active tile background */
+  --a11y-font:'Poppins',sans-serif;
+}</code></pre>
+
+      <h2>3. Options</h2>
+      <table>
+        <tr><th>Attribute on &lt;script&gt;</th><th>Default</th><th>What it does</th></tr>
+        <tr><td><code>data-root</code></td><td><code>#a11y-root</code></td><td>The content the tools change. If missing, the body is wrapped automatically.</td></tr>
+        <tr><td><code>data-trigger</code></td><td><code>[data-a11y-open]</code></td><td>Selector for buttons that open the panel.</td></tr>
+        <tr><td><code>data-lang</code></td><td><code>ms</code></td><td>Panel language: <code>ms</code> or <code>en</code>.</td></tr>
+        <tr><td><code>data-storage-key</code></td><td><code>site-a11y</code></td><td>Where settings are saved in the browser. Use a different key per website.</td></tr>
+        <tr><td><code>data-read-selector</code></td><td><code>h1,h2,h3,h4,p,li</code></td><td>What “Baca halaman ini” reads aloud.</td></tr>
+        <tr><td><code>data-reader-hide</code></td><td>—</td><td>Extra selectors hidden in Reader mode, e.g. <code>.hero,.partners</code>.</td></tr>
+      </table>
+
+      <h2>4. Helpers</h2>
+      <ul>
+        <li><code>A11y.open()</code>, <code>A11y.close()</code>, <code>A11y.reset()</code>, <code>A11y.setLang('en')</code></li>
+        <li>Add <code>data-a11y-bg</code> to elements that use a CSS background photo so “Sembunyikan imej” and “Mod bacaan” can hide it.</li>
+        <li>Add <code>data-a11y-decor</code> to anything decorative that Reader mode should remove.</li>
+      </ul>
+    </div>
+
+    <h2>Try it on sample content</h2>
+    <p>Open the panel and switch on a profile such as <strong>Disleksia</strong> or <strong>Warga emas</strong>. Every change applies to this page and is remembered in this browser.</p>
+    <p><a href="../home.html">← Back to the JAWHAR homepage</a></p>
+    <img src="../assets/img/waqf.jpg" alt="Sample photo for the hide-images option" width="420">
+  </main>
+</div>
+
+<script src="a11y.js" data-lang="ms" data-storage-key="a11y-demo" defer></script>
+</body>
+</html>
